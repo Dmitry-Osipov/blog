@@ -3,10 +3,24 @@ from django.db import models
 from django.utils import timezone
 
 # Create your models here.
+class PublishedManager(models.Manager):
+    """
+    Менеджер модели отбирает только те записи, у которых стоит флаг публикации.
+    """
+    def get_queryset(self):
+        """
+        Метод отбора только опубликованных записей.
+
+        :return: QuerySet, состоящий только из опубликованных записей.
+        """
+        return super().get_queryset().filter(status=Post.Status.PUBLISHED)
+
+
 class Post(models.Model):
     """
     Модель данных для постов блога. Посты будут иметь автора, заголовок, слаг, тело, статус публикации, а также время
-    публикации, создания и обновления.
+    публикации, создания и обновления. Модель имеет 2 менеджера записей: стандартный и кастомный (отбирает только
+    опубликованные записи).
     """
     class Status(models.TextChoices):
         """
@@ -23,6 +37,9 @@ class Post(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     status = models.CharField(max_length=2, choices=Status.choices, default=Status.DRAFT)
+
+    objects = models.Manager()
+    published = PublishedManager()
 
     class Meta:
         """
