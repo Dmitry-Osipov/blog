@@ -70,3 +70,34 @@ class Post(models.Model):
         :return: Заголовок.
         """
         return self.title
+
+
+class Comment(models.Model):
+    """
+    Модель комментария к посту. Комментарий имеет связь многие-к-одному с постом (один пост - много комментариев),
+    автора, почту, сообщение, время создания и обновления, а также статус.
+    """
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
+    name = models.CharField(max_length=80)
+    email = models.EmailField()
+    body = models.TextField()
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+    active = models.BooleanField(default=True)
+
+    class Meta:
+        """
+        Вложенный класс предназначен для корректной обработки данных модели.
+        """
+        ordering = ('-created', )
+        indexes = [
+            models.Index(fields=['created'])
+        ]
+
+    def __str__(self):
+        """
+        Метод обеспечивает экземпляру класса корректное наименование.
+
+        :return: Корректное название экземпляра класса.
+        """
+        return f'Comment by {self.name} on {self.post}'
