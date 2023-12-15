@@ -2,6 +2,8 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
 from django.urls import reverse
+from taggit.managers import TaggableManager
+
 
 # Create your models here.
 class PublishedManager(models.Manager):
@@ -19,8 +21,8 @@ class PublishedManager(models.Manager):
 
 class Post(models.Model):
     """
-    Модель данных для постов блога. Посты будут иметь автора, заголовок, слаг, тело, статус публикации, а также время
-    публикации, создания и обновления. Модель имеет 2 менеджера записей: стандартный и кастомный (отбирает только
+    Модель данных для постов блога. Посты будут иметь автора, заголовок, слаг, тело, статус публикации, теги, а также
+    время публикации, создания и обновления. Модель имеет 2 менеджера записей: стандартный и кастомный (отбирает только
     опубликованные записи).
     """
     class Status(models.TextChoices):
@@ -38,6 +40,7 @@ class Post(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     status = models.CharField(max_length=2, choices=Status.choices, default=Status.DRAFT)
+    tags = TaggableManager()
 
     objects = models.Manager()
     published = PublishedManager()
