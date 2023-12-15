@@ -21,6 +21,14 @@ class PostListView(ListView):
 
 
 def post_list(request, tag_slug=None):
+    """
+    Функция представления отвечает за списка постов.
+
+    :param request: Запрос клиента.
+    :param tag_slug: Слаг тега поста.
+    :return: HTML-страница опубликованных поста.
+    :raises Http404: Ошибка 404, если нет опубликованных постов.
+    """
     post_list = Post.published.all()
     tag = None
     if tag_slug:
