@@ -5,6 +5,7 @@ from django.views.generic import ListView
 from django.views.decorators.http import require_POST
 from taggit.models import Tag
 from django.db.models import Count
+from django.contrib.postgres.search import SearchVector
 
 from .forms import *
 from .models import *
@@ -51,7 +52,10 @@ def post_detail(request, year, month, day, post):
     Функция представления отвечает за отображение конкретного поста.
 
     :param request: Запрос клиента.
-    :param id: ID записи.
+    :param year: Год обновления поста.
+    :param month: Месяц обновления поста.
+    :param day: День обновления поста.
+    :param post: Слаг поста.
     :return: HTML-страница опубликованного поста.
     :raises Http404: Ошибка 404, если нет опубликованного поста с переданным id.
     """
@@ -122,3 +126,24 @@ def post_comment(request, post_id):
 
     return render(request, 'blog_app/post/comment.html',
                   context={'post': post, 'form': form, 'comment': comment})
+
+
+def post_search(request):
+    """
+    Функция представления отображает страницу поиска по постам.
+
+    :param request: Запрос клиента.
+    :return: HTML-страница с результатами поиска.
+    """
+    form = SearchForm()
+    query = None
+    results = list()
+
+    if 'query' in request.GET:
+        form = SearchForm(request.GET)
+        if form.is_valid():
+            query = form.cleaned_data['query']
+            results = Post.published.annotate(search=SearchVector('title', 'body')).filter(search=query)
+
+    return render(request, 'blog_app/post/search.html',
+                  context={'form': form, 'query': query, 'results': results})

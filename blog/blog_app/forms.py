@@ -1,4 +1,5 @@
 from django import forms
+
 from .models import Comment
 
 
@@ -22,3 +23,10 @@ class CommentForm(forms.ModelForm):
         """
         model = Comment
         fields = ('name', 'email', 'body')
+
+
+class SearchForm(forms.Form):
+    """
+    Форма помогает пользователю выполнять поиск постов.
+    """
+    query = forms.CharField()
