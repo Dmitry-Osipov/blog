@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'blog_app.apps.BlogAppConfig',
     'taggit',
+    'django.contrib.sites',
+    'django.contrib.sitemaps',
 ]
 
 MIDDLEWARE = [
@@ -129,3 +131,5 @@ EMAIL_HOST_USER = 'dimaosipov00@gmail.com'
 EMAIL_HOST_PASSWORD = 'zmuw arzl wiuo wdsb'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
+
+SITE_ID = 1

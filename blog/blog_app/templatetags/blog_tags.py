@@ -1,4 +1,6 @@
+import markdown
 from django import template
+from django.utils.safestring import mark_safe
 from django.db.models import Count
 
 from ..models import Post
@@ -37,3 +39,14 @@ def get_most_commented_posts(count=5):
     :return: Упорядоченный QuerySet постов.
     """
     return Post.published.annotate(total_comments=Count('comments')).order_by('-total_comments')[:count]
+
+
+@register.filter(name='markdown')
+def markdown_format(text):
+    """
+    Метод позволяет писать посты в формате markdown.
+
+    :param text: Текст.
+    :return: Неэкранированные строки текста.
+    """
+    return mark_safe(markdown.markdown(text))
