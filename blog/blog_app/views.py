@@ -1,14 +1,15 @@
+from django.contrib.postgres.search import SearchVector, SearchQuery, TrigramSimilarity
 from django.core.mail import send_mail
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
-from django.shortcuts import render, get_object_or_404
-from django.views.generic import ListView
-from django.views.decorators.http import require_POST
-from taggit.models import Tag
 from django.db.models import Count
-from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank, TrigramSimilarity
+from django.shortcuts import render, get_object_or_404
+from django.views.decorators.http import require_POST
+from django.views.generic import ListView
+from taggit.models import Tag
 
 from .forms import *
 from .models import *
+
 
 # Create your views here.
 class PostListView(ListView):
@@ -147,9 +148,9 @@ def post_search(request):
             # Выставили вес поиска: по умолчанию D, C, B, A, их веса - 0.1, 0.2, 0.4, 1.0 соответственно.
             search_query = SearchQuery(query)
             results = (Post.published
-                       .annotate(search=search_vector, rank=SearchRank(search_vector, search_query))
-                       .filter(rank__gte=0.3)
-                       .order_by('-rank'))
+                       .annotate(similarity=TrigramSimilarity('title', query))
+                       .filter(similarity__gt=0.1)
+                       .order_by('-similarity'))
 
     return render(request, 'blog_app/post/search.html',
                   context={'form': form, 'query': query, 'results': results})
